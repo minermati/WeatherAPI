@@ -97,10 +97,11 @@
             font-size: 8rem; /* Wielka cyfra */
             font-weight: 800;
             line-height: 1;
-            background: linear-gradient(180deg, #fff 0%, #aaa 100%); /* Delikatny gradient */
+            background: linear-gradient(180deg, #383737 0%, #aaa 100%); /* Delikatny gradient */
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 20px rgba(255,255,255,0.2)); /* Delikatna poświata */
+
         }
 
         .wind {
@@ -137,6 +138,15 @@
             opacity: 0.8; /* Tylko delikatnie przygaszona */
         }
 
+        .unit {
+            font-size: 2.5rem;      /* Mniejsza niż liczba */
+            font-weight: 300;       /* Cieńsza */
+            vertical-align: top;    /* Podciągnięta do góry */
+            margin-left: 5px;
+            opacity: 0.6;           /* Lekko przezroczysta */
+            color: #fff;
+        }
+
         .title {
             color: #ffffff;
             font-family: -apple-system, sans-serif;
@@ -155,7 +165,7 @@
           <div class="title">
               Deszczoradar2137
           </div>
-          <button type="button" class="button" id="pogoda" onclick="sprawdzpogode()">Sprawdz pogode</button>
+          <button type="button" class="button" id="pogoda" onclick="sprawdzpogode()">Sprawdź pogodę</button>
       </div>
       <div class="body" id="wynik">
 
