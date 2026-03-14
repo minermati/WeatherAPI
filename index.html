@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
+        .layout {
+            width: 100%;
+            min-height: 100vh;
+
+            display: grid;
+            grid:
+            "sidebar body" 1fr
+            / 30% 1fr;
+        }
+        .button {
+            appearance: none;
+            background-color: #FFFFFF;
+            border-radius: 40em;
+            border-style: none;
+            box-shadow: #ADCFFF 0 -12px 6px inset;
+            box-sizing: border-box;
+            color: #000000;
+            cursor: pointer;
+            display: flex;
+            font-family: -apple-system,sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -.24px;
+            outline: none;
+            padding: 1rem 1.3rem;
+            quotes: auto;
+            text-align: center;
+            text-decoration: none;
+            transition: all .15s;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            }
+
+            .button:hover {
+            background-color: #00ffde;
+            box-shadow: #09a2bd 0 -6px 8px inset;
+            transform: scale(1.125);
+            }
+
+            .button:active {
+            transform: scale(1.025);
+            }
+
+            @media (min-width: 768px) {
+            .button {
+                font-size: 1.5rem;
+                padding: .75rem 2rem;
+            }
+            }
+
+        .sidebar {
+            grid-area: sidebar;
+            background-color: #5e5a5a;
+            display: flex;
+            flex-direction: column; /* Układa elementy jeden pod drugim */
+            justify-content: center; /* Centruje cały zestaw (napis + guzik) w pionie */
+            align-items: center;    /* Centruje w poziomie */
+            padding: 20px;
+        }
+        .body {
+            grid-area: body;
+            background-color: #c6c3c3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .weather-display {
+            font-family: 'Inter', -apple-system, sans-serif; /* Modernistyczne fonty */
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .city-name {
+            font-size: 1.5rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 0.5rem; /* Szeroki rozstaw liter = luksusowy wygląd */
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .temperature {
+            font-size: 8rem; /* Wielka cyfra */
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(180deg, #fff 0%, #aaa 100%); /* Delikatny gradient */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.2)); /* Delikatna poświata */
+        }
+
+        .wind {
+            display: flex;
+            justify-content: center; /* Centruje zestaw w poziomie */
+            align-items: baseline;    /* Wyrównuje liczbę i tekst do jednej linii */
+
+            margin-top: 40px;
+        }
+
+        .wind-value {
+            /* Prawie tak duża jak temperatura, ale trochę mniejsza,
+               żeby zachować hierarchię */
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+
+            /* Kolor: używamy tej samej jasności/poświaty co WARSAW i 17°C */
+            color: #fff;
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+        }
+
+        .unit2 {
+            /* Jednostka km/h musi być mniejsza, żeby wyglądało to nowocześnie */
+            font-size: 1.5rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-left: 10px; /* Odstęp od liczby */
+
+            /* Przeźroczystość psuje modernistyczny look przy tej jasności,
+               zostawmy ją białą, ale cieńszą (font-weight: 300) */
+            color: #fff;
+            opacity: 0.8; /* Tylko delikatnie przygaszona */
+        }
+
+        .title {
+            color: #ffffff;
+            font-family: -apple-system, sans-serif;
+            font-weight: 700;
+            font-size: 2rem;
+            letter-spacing: 3px;
+            margin-bottom: 50px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <section class="layout">
+      <div class="sidebar">
+          <div class="title">
+              Deszczoradar2137
+          </div>
+          <button type="button" class="button" id="pogoda" onclick="sprawdzpogode()">Sprawdz pogode</button>
+      </div>
+      <div class="body" id="wynik">
+
+      </div>
+    </section>
+</body>
+</html>
+
+<script>
+    async function sprawdzpogode() {
+        let response = await fetch("/pogoda");
+        let dane = await response.json();
+        console.log(dane);
+        document.getElementById("wynik").innerHTML = `
+            <div class="weather-display">
+                <div class="city-name">${dane.city}</div>
+                <div class="temperature">
+                    ${Math.round(dane.temp)}<span class="unit">°C</span>
+                </div>
+                <div class="wind">
+                    <span class="wind-value">Wiatr: ${Math.round(dane.wind)}</span>
+                    <span class="unit2">km/h</span>
+                </div>
+            </div>`;
+    }
+</script>
