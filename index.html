@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Pogoda</title>
     <style>
         html, body {
         margin: 0;
@@ -166,19 +166,55 @@
 
 <script>
     async function sprawdzpogode() {
-        let response = await fetch("/pogoda");
-        let dane = await response.json();
-        console.log(dane);
-        document.getElementById("wynik").innerHTML = `
-            <div class="weather-display">
-                <div class="city-name">${dane.city}</div>
-                <div class="temperature">
-                    ${Math.round(dane.temp)}<span class="unit">°C</span>
-                </div>
-                <div class="wind">
-                    <span class="wind-value">Wiatr: ${Math.round(dane.wind)}</span>
-                    <span class="unit2">km/h</span>
-                </div>
-            </div>`;
+        // 1. Sprawdzamy, czy przeglądarka w ogóle obsługuje GPS
+        if ("geolocation" in navigator) {
+
+            // Zmieniamy tekst guzika na czas szukania satelity/lokalizacji
+            document.getElementById("pogoda").innerText = "Szukam GPS...";
+
+            // 2. Prosimy o lokalizację
+            navigator.geolocation.getCurrentPosition(async function(position) {
+
+                // Mamy to! Wyciągamy koordynaty
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                try {
+                    // 3. Wysyłamy GPS do naszego Pythona (doklejamy parametry do linku)
+                    let response = await fetch(`/pogoda?lat=${lat}&lon=${lon}`);
+                    let dane = await response.json();
+
+                    // 4. Wstawiamy na stronę (tutaj wklej swoje formatowanie HTML!)
+                    document.getElementById("wynik").innerHTML = `
+                        <div class="weather-display">
+                            <div class="city-name">${dane.city}</div>
+                            <div class="temp-row">
+                                <span class="temperature">${Math.round(dane.temp)}</span>
+                                <span class="unit">°C</span>
+                            </div>
+                            <div class="wind">
+                                <span class="wind-value">${Math.round(dane.wind)}</span>
+                                <span class="unit2">km/h</span>
+                            </div>
+                        </div>
+                    `;
+
+                    // Przywracamy tekst guzika
+                    document.getElementById("pogoda").innerText = "Sprawdź pogodę";
+
+                } catch (error) {
+                    console.error("Błąd API:", error);
+                    document.getElementById("pogoda").innerText = "Błąd pobierania!";
+                }
+
+            }, function(error) {
+                // Co jeśli użytkownik kliknie "Zablokuj" w okienku o lokalizacji?
+                alert("Musisz zezwolić na dostęp do lokalizacji, żeby sprawdzić pogodę!");
+                document.getElementById("pogoda").innerText = "Sprawdź pogodę";
+            });
+
+        } else {
+            alert("Twoja przeglądarka nie wspiera geolokalizacji.");
+        }
     }
 </script>

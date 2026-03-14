@@ -14,28 +14,29 @@ def index():
 async def sprawdz_ip():
     async with httpx.AsyncClient() as client:
         response = await client.get("https://api.ipify.org?format=json")
-
     dane = response.json()
-    # Zwracamy słownik, żeby JS był szczęśliwy
     return {"ip": dane["ip"]}
 
 
+# ZMIANA: Endpoint teraz wymaga podania lat i lon!
 @app.get("/pogoda")
-async def pogoda():
+async def pogoda(lat: float, lon: float):
     async with httpx.AsyncClient() as client:
-        # Pobieramy lokalizację
-        res_loc = await client.get("http://ip-api.com/json")
-        loc_data = res_loc.json()
+        # 1. Zamieniamy współrzędne GPS na nazwę miasta (Reverse Geocode)
+        res_city = await client.get(
+            f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={lat}&longitude={lon}"
+        )
+        city_data = res_city.json()
+        # Wyciągamy miasto (lub jeśli brakuje, bierzemy lokalizację ogólną)
+        city = city_data.get("city") or city_data.get("locality") or "Nieznane miejsce"
 
-        lat = loc_data['lat']
-        lon = loc_data['lon']
-        city = loc_data['city']
-
-        # Pobieramy pogodę
+        # 2. Pobieramy pogodę dla konkretnego GPSa z Open-Meteo
         res_pog = await client.get(
-            f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true")
+            f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+        )
         pog_data = res_pog.json()
-    # Zwracamy kompletny obiekt
+
+    # Zwracamy gotowy wynik
     return {
         "city": city,
         "temp": pog_data['current_weather']['temperature'],
